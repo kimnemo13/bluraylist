@@ -1,0 +1,273 @@
+:root {
+  color-scheme: light;
+  font-family: "Pretendard", "Noto Sans KR", sans-serif;
+  --bg: #f5f6fb;
+  --card: #ffffff;
+  --text: #1a1f36;
+  --muted: #5c647a;
+  --primary: #3f51f5;
+  --accent: #00b3a6;
+  --danger: #e04f5f;
+  --border: #e1e4f2;
+  --shadow: 0 20px 45px rgba(17, 23, 41, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+}
+
+.hero h1 {
+  font-size: 2.4rem;
+  margin: 8px 0 12px;
+}
+
+.eyebrow {
+  font-size: 0.9rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.subtitle {
+  color: var(--muted);
+  max-width: 500px;
+  line-height: 1.6;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(120px, 1fr));
+  gap: 12px;
+  background: var(--card);
+  padding: 16px 20px;
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  min-width: 320px;
+}
+
+.stats div {
+  text-align: center;
+}
+
+.stats span {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.stats small {
+  color: var(--muted);
+}
+
+.card {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: var(--shadow);
+}
+
+.form-card h2,
+.list-card h2 {
+  margin-bottom: 16px;
+}
+
+form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+label {
+  font-weight: 600;
+  color: var(--muted);
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #fafbff;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid rgba(63, 81, 245, 0.2);
+  border-color: var(--primary);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  grid-column: 1 / -1;
+}
+
+button {
+  font: inherit;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 20px;
+  cursor: pointer;
+}
+
+button.primary {
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+}
+
+button.ghost {
+  background: #eef1ff;
+  color: var(--text);
+}
+
+button.ghost.danger {
+  background: rgba(224, 79, 95, 0.1);
+  color: var(--danger);
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.search input {
+  min-width: 240px;
+}
+
+.search .hint {
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.result-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  padding: 16px;
+  border-radius: 16px;
+  background: #f7f8ff;
+  margin-bottom: 16px;
+}
+
+.result-summary span {
+  display: block;
+  font-weight: 700;
+}
+
+.result-summary small {
+  color: var(--muted);
+}
+
+.empty {
+  padding: 24px;
+  border: 1px dashed var(--border);
+  border-radius: 14px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.entry-list {
+  display: grid;
+  gap: 16px;
+}
+
+.entry {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  background: #fbfcff;
+  display: grid;
+  gap: 10px;
+}
+
+.entry-main {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.entry-title {
+  font-size: 1.2rem;
+}
+
+.entry-meta {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.badge {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(63, 81, 245, 0.1);
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.entry-memo {
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.entry-actions {
+  display: flex;
+  gap: 8px;
+}
+
+@media (max-width: 900px) {
+  .hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .stats {
+    width: 100%;
+  }
+}

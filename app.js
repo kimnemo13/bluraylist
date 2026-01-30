@@ -1,0 +1,196 @@
+const STORAGE_KEY = "bluraylist.entries";
+
+const entryForm = document.getElementById("entryForm");
+const entryList = document.getElementById("entryList");
+const entryTemplate = document.getElementById("entryTemplate");
+const searchInput = document.getElementById("searchInput");
+const filterType = document.getElementById("filterType");
+const sortType = document.getElementById("sortType");
+const emptyState = document.getElementById("emptyState");
+const totalCount = document.getElementById("totalCount");
+const blurayCount = document.getElementById("blurayCount");
+const dvdCount = document.getElementById("dvdCount");
+const resultCount = document.getElementById("resultCount");
+const ownershipStatus = document.getElementById("ownershipStatus");
+
+let entries = loadEntries();
+
+function loadEntries() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) {
+    return [];
+  }
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    console.warn("Failed to parse entries", error);
+    return [];
+  }
+}
+
+function saveEntries() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+}
+
+function formatDate(dateValue) {
+  if (!dateValue) return "";
+  const [year, month, day] = dateValue.split("-");
+  return `${year}.${month}.${day}`;
+}
+
+function updateStats() {
+  totalCount.textContent = entries.length;
+  blurayCount.textContent = entries.filter((entry) => entry.mediaType === "Blu-ray").length;
+  dvdCount.textContent = entries.filter((entry) => entry.mediaType === "DVD").length;
+}
+
+function renderEntries() {
+  const query = searchInput.value.trim().toLowerCase();
+  const typeFilter = filterType.value;
+  const sortOption = sortType.value;
+
+  const filtered = entries.filter((entry) => {
+    const matchesType = typeFilter === "all" || entry.mediaType === typeFilter;
+    const text = `${entry.title} ${entry.memo}`.toLowerCase();
+    const matchesQuery = !query || text.includes(query);
+    return matchesType && matchesQuery;
+  });
+
+  const sorted = [...filtered].sort((a, b) => {
+    if (sortOption === "title") {
+      return a.title.localeCompare(b.title, "ko");
+    }
+    if (sortOption === "oldest") {
+      return new Date(a.purchaseDate) - new Date(b.purchaseDate);
+    }
+    return new Date(b.purchaseDate) - new Date(a.purchaseDate);
+  });
+
+  entryList.innerHTML = "";
+  emptyState.style.display = sorted.length === 0 ? "block" : "none";
+  resultCount.textContent = sorted.length;
+
+  sorted.forEach((entry) => {
+    const node = entryTemplate.content.cloneNode(true);
+    node.querySelector(".entry-title").textContent = entry.title;
+    node.querySelector(".entry-meta").textContent = `${formatDate(entry.purchaseDate)} · ${entry.memo ? "메모 있음" : "메모 없음"}`;
+    node.querySelector(".badge").textContent = entry.mediaType;
+    node.querySelector(".entry-memo").textContent = entry.memo || "메모가 없습니다.";
+
+    node.querySelectorAll("button").forEach((button) => {
+      button.dataset.id = entry.id;
+    });
+
+    entryList.appendChild(node);
+  });
+
+  updateStats();
+  updateOwnershipStatus(query);
+}
+
+function resetForm() {
+  entryForm.reset();
+  entryForm.querySelector("#title").focus();
+}
+
+function updateOwnershipStatus(query) {
+  if (!query) {
+    ownershipStatus.textContent = "검색어를 입력해주세요.";
+    return;
+  }
+
+  const match = entries.find((entry) => entry.title.toLowerCase().includes(query));
+  ownershipStatus.textContent = match ? `"${match.title}" 구매 기록 있음` : "구매 기록 없음";
+}
+
+function addEntry(formData) {
+  const newEntry = {
+    id: crypto.randomUUID(),
+    title: formData.get("title").trim(),
+    mediaType: formData.get("mediaType"),
+    purchaseDate: formData.get("purchaseDate"),
+    memo: formData.get("memo").trim(),
+  };
+
+  entries = [newEntry, ...entries];
+  saveEntries();
+  renderEntries();
+  resetForm();
+}
+
+function updateEntry(id, formData) {
+  entries = entries.map((entry) =>
+    entry.id === id
+      ? {
+          ...entry,
+          title: formData.get("title").trim(),
+          mediaType: formData.get("mediaType"),
+          purchaseDate: formData.get("purchaseDate"),
+          memo: formData.get("memo").trim(),
+        }
+      : entry,
+  );
+  saveEntries();
+  renderEntries();
+  resetForm();
+}
+
+function populateForm(entry) {
+  entryForm.title.value = entry.title;
+  entryForm.mediaType.value = entry.mediaType;
+  entryForm.purchaseDate.value = entry.purchaseDate;
+  entryForm.memo.value = entry.memo;
+  entryForm.dataset.editing = entry.id;
+  entryForm.querySelector("button.primary").textContent = "기록 수정";
+}
+
+function clearEditingState() {
+  delete entryForm.dataset.editing;
+  entryForm.querySelector("button.primary").textContent = "기록 저장";
+}
+
+entryForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const formData = new FormData(entryForm);
+  const editingId = entryForm.dataset.editing;
+
+  if (editingId) {
+    updateEntry(editingId, formData);
+    clearEditingState();
+    return;
+  }
+
+  addEntry(formData);
+});
+
+entryForm.addEventListener("reset", () => {
+  clearEditingState();
+});
+
+entryList.addEventListener("click", (event) => {
+  const action = event.target.dataset.action;
+  const id = event.target.dataset.id;
+  if (!action || !id) return;
+
+  if (action === "delete") {
+    entries = entries.filter((entry) => entry.id !== id);
+    saveEntries();
+    renderEntries();
+    return;
+  }
+
+  if (action === "edit") {
+    const entry = entries.find((item) => item.id === id);
+    if (entry) {
+      populateForm(entry);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }
+});
+
+searchInput.addEventListener("input", renderEntries);
+filterType.addEventListener("change", renderEntries);
+sortType.addEventListener("change", renderEntries);
+
+renderEntries();
