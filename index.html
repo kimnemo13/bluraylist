@@ -62,6 +62,15 @@
         </form>
       </section>
 
+      <section class="card guide-card">
+        <h2>빠른 실행 안내</h2>
+        <ol class="guide-list">
+          <li>index.html, style.css, app.js 세 파일이 같은 폴더에 있는지 확인합니다.</li>
+          <li>index.html 파일을 더블 클릭하면 바로 실행됩니다.</li>
+          <li>기록은 브라우저에 저장되므로 다른 PC/브라우저에서는 보이지 않습니다.</li>
+        </ol>
+      </section>
+
       <section class="card list-card">
         <div class="list-header">
           <h2>나의 구매 리스트</h2>
@@ -80,6 +89,9 @@
               <option value="oldest">오래된순</option>
               <option value="title">제목순</option>
             </select>
+            <button id="exportButton" class="ghost" type="button">내보내기</button>
+            <label class="ghost import-label" for="importInput">불러오기</label>
+            <input id="importInput" type="file" accept="application/json" hidden />
           </div>
         </div>
 

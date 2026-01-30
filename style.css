@@ -94,6 +94,16 @@ body {
   margin-bottom: 16px;
 }
 
+.guide-card h2 {
+  margin-bottom: 12px;
+}
+
+.guide-list {
+  padding-left: 20px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
 form {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -177,6 +187,15 @@ button.ghost.danger {
 
 .search input {
   min-width: 240px;
+}
+
+.import-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  border-radius: 999px;
+  cursor: pointer;
 }
 
 .search .hint {

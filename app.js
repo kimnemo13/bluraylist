@@ -1,4 +1,5 @@
 const STORAGE_KEY = "bluraylist.entries";
+const STORAGE_VERSION = 1;
 
 const entryForm = document.getElementById("entryForm");
 const entryList = document.getElementById("entryList");
@@ -6,6 +7,8 @@ const entryTemplate = document.getElementById("entryTemplate");
 const searchInput = document.getElementById("searchInput");
 const filterType = document.getElementById("filterType");
 const sortType = document.getElementById("sortType");
+const exportButton = document.getElementById("exportButton");
+const importInput = document.getElementById("importInput");
 const emptyState = document.getElementById("emptyState");
 const totalCount = document.getElementById("totalCount");
 const blurayCount = document.getElementById("blurayCount");
@@ -22,7 +25,11 @@ function loadEntries() {
   }
   try {
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    const list = Array.isArray(parsed) ? parsed : [];
+    return list.map((entry) => ({
+      ...entry,
+      createdAt: entry.createdAt ?? entry.purchaseDate ?? new Date().toISOString(),
+    }));
   } catch (error) {
     console.warn("Failed to parse entries", error);
     return [];
@@ -39,6 +46,10 @@ function formatDate(dateValue) {
   return `${year}.${month}.${day}`;
 }
 
+function normalizeText(value) {
+  return value.trim().toLowerCase();
+}
+
 function updateStats() {
   totalCount.textContent = entries.length;
   blurayCount.textContent = entries.filter((entry) => entry.mediaType === "Blu-ray").length;
@@ -46,13 +57,13 @@ function updateStats() {
 }
 
 function renderEntries() {
-  const query = searchInput.value.trim().toLowerCase();
+  const query = normalizeText(searchInput.value);
   const typeFilter = filterType.value;
   const sortOption = sortType.value;
 
   const filtered = entries.filter((entry) => {
     const matchesType = typeFilter === "all" || entry.mediaType === typeFilter;
-    const text = `${entry.title} ${entry.memo}`.toLowerCase();
+    const text = normalizeText(`${entry.title} ${entry.memo}`);
     const matchesQuery = !query || text.includes(query);
     return matchesType && matchesQuery;
   });
@@ -62,9 +73,9 @@ function renderEntries() {
       return a.title.localeCompare(b.title, "ko");
     }
     if (sortOption === "oldest") {
-      return new Date(a.purchaseDate) - new Date(b.purchaseDate);
+      return getSortDate(a) - getSortDate(b);
     }
-    return new Date(b.purchaseDate) - new Date(a.purchaseDate);
+    return getSortDate(b) - getSortDate(a);
   });
 
   entryList.innerHTML = "";
@@ -100,8 +111,52 @@ function updateOwnershipStatus(query) {
     return;
   }
 
-  const match = entries.find((entry) => entry.title.toLowerCase().includes(query));
+  const match = entries.find((entry) => normalizeText(entry.title) === query);
   ownershipStatus.textContent = match ? `"${match.title}" 구매 기록 있음` : "구매 기록 없음";
+}
+
+function getSortDate(entry) {
+  const value = entry.purchaseDate || entry.createdAt;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? 0 : date.getTime();
+}
+
+function exportEntries() {
+  const payload = {
+    version: STORAGE_VERSION,
+    exportedAt: new Date().toISOString(),
+    entries,
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "bluraylist-backup.json";
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function importEntries(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(reader.result);
+      const imported = Array.isArray(parsed) ? parsed : parsed.entries;
+      if (!Array.isArray(imported)) {
+        throw new Error("Invalid import format");
+      }
+      entries = imported.map((entry) => ({
+        ...entry,
+        createdAt: entry.createdAt ?? entry.purchaseDate ?? new Date().toISOString(),
+      }));
+      saveEntries();
+      renderEntries();
+    } catch (error) {
+      alert("불러오기 파일 형식이 올바르지 않습니다.");
+      console.warn(error);
+    }
+  };
+  reader.readAsText(file);
 }
 
 function addEntry(formData) {
@@ -111,6 +166,7 @@ function addEntry(formData) {
     mediaType: formData.get("mediaType"),
     purchaseDate: formData.get("purchaseDate"),
     memo: formData.get("memo").trim(),
+    createdAt: new Date().toISOString(),
   };
 
   entries = [newEntry, ...entries];
@@ -128,6 +184,7 @@ function updateEntry(id, formData) {
           mediaType: formData.get("mediaType"),
           purchaseDate: formData.get("purchaseDate"),
           memo: formData.get("memo").trim(),
+          updatedAt: new Date().toISOString(),
         }
       : entry,
   );
@@ -192,5 +249,13 @@ entryList.addEventListener("click", (event) => {
 searchInput.addEventListener("input", renderEntries);
 filterType.addEventListener("change", renderEntries);
 sortType.addEventListener("change", renderEntries);
+exportButton.addEventListener("click", exportEntries);
+importInput.addEventListener("change", (event) => {
+  const file = event.target.files?.[0];
+  if (file) {
+    importEntries(file);
+  }
+  event.target.value = "";
+});
 
 renderEntries();
