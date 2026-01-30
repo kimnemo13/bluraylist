@@ -1,101 +1,47 @@
-<link rel="stylesheet" href="./style.css">
-<script defer src="./app.js"></script>
 
-
-<!doctype html>
-<html lang="ko">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>블루레이 구매 기록</title>
-  <link rel="stylesheet" href="./style.css" />
-  <script defer src="./app.js"></script>
-</head>
-<body>
-  <div class="wrap">
-    <header class="header">
-      <h1>블루레이/디스크 구매 기록</h1>
-      <p class="sub">영화명 · 매체 · 구매일 · 메모를 저장하고 검색하세요 (이 브라우저에 저장됨)</p>
-    </header>
-
-    <section class="card">
-      <h2>새 기록 추가</h2>
-      <form id="addForm" class="form">
-        <label>
-          영화 제목
-          <input id="title" type="text" placeholder="예: 블레이드 러너 2049" required />
-        </label>
-
-        <label>
-          매체
-          <select id="media" required>
-            <option value="Blu-ray">Blu-ray</option>
-            <option value="4K UHD">4K UHD</option>
-            <option value="DVD">DVD</option>
-            <option value="Steelbook">Steelbook</option>
-            <option value="Other">Other</option>
-          </select>
-        </label>
-
-        <label>
-          구매일
-          <input id="purchaseDate" type="date" required />
-        </label>
-
-        <label class="full">
-          메모
-          <textarea id="memo" rows="3" placeholder="예: 한정판, 자막 확인, 특전 포함 등"></textarea>
-        </label>
-
-        <div class="actions">
-          <button type="submit">저장</button>
-          <button type="button" id="resetBtn" class="ghost">초기화</button>
-        </div>
-      </form>
-    </section>
-
-    <section class="card">
-      <div class="row">
-        <h2>검색 / 필터</h2>
-        <div class="tools">
-          <button type="button" id="exportBtn" class="ghost">내보내기(JSON)</button>
-          <label class="importLabel ghost">
-            가져오기(JSON)
-            <input type="file" id="importFile" accept="application/json" hidden />
-          </label>
-        </div>
-      </div>
-
-      <div class="filters">
-        <input id="q" type="search" placeholder="검색: 영화 제목 또는 메모" />
-        <select id="mediaFilter">
-          <option value="">전체 매체</option>
-          <option value="Blu-ray">Blu-ray</option>
-          <option value="4K UHD">4K UHD</option>
-          <option value="DVD">DVD</option>
-          <option value="Steelbook">Steelbook</option>
-          <option value="Other">Other</option>
-        </select>
-        <select id="sort">
-          <option value="dateDesc">구매일 최신순</option>
-          <option value="dateAsc">구매일 오래된순</option>
-          <option value="titleAsc">제목 A→Z</option>
-          <option value="titleDesc">제목 Z→A</option>
-        </select>
-      </div>
-
-      <div class="meta">
-        <span id="countText">0개</span>
-        <button type="button" id="clearBtn" class="danger ghost">전체 삭제</button>
-      </div>
-
-      <ul id="list" class="list"></ul>
-      <p id="empty" class="empty">아직 기록이 없습니다. 위에서 첫 기록을 저장해보세요.</p>
-    </section>
-
-    <footer class="footer">
-      <small>주의: 이 사이트는 localStorage(브라우저 저장소)에 저장됩니다. 다른 기기/브라우저에서는 기록이 보이지 않습니다.</small>
-    </footer>
-  </div>
-</body>
-</html>
+ <link rel="stylesheet" href="./style.css">
+ <script defer src="./app.js"></script>
+ 
+ 
+ <!doctype html>
+ <html lang="ko">
+ <head>
+   <meta charset="utf-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1" />
+   <title>블루레이 구매 기록</title>
+   <link rel="stylesheet" href="./style.css" />
+   <script defer src="./app.js"></script>
+ </head>
+ <body>
+   <div class="wrap">
+     <header class="header">
+-      <h1>블루레이/디스크 구매 기록</h1>
++      <h1>블루레이/DVD 구매 기록</h1>
+       <p class="sub">영화명 · 매체 · 구매일 · 메모를 저장하고 검색하세요 (이 브라우저에 저장됨)</p>
+     </header>
+ 
+     <section class="card">
+       <h2>새 기록 추가</h2>
+       <form id="addForm" class="form">
+         <label>
+           영화 제목
+           <input id="title" type="text" placeholder="예: 블레이드 러너 2049" required />
+         </label>
+ 
+         <label>
+           매체
+           <select id="media" required>
+             <option value="Blu-ray">Blu-ray</option>
+             <option value="4K UHD">4K UHD</option>
+             <option value="DVD">DVD</option>
+             <option value="Steelbook">Steelbook</option>
+             <option value="Other">Other</option>
+           </select>
+         </label>
+ 
+         <label>
+           구매일
+           <input id="purchaseDate" type="date" required />
+ 
+EOF
+)
